@@ -22,6 +22,11 @@ def safe_internet_fetch(func):
     Raises:
         BabyFetchException: if it fails to fetch the html codes from the url.
     """
+    
+    try: 
+        return func
+    except urllib.error.URLError:
+        raise BabyFetchException("fail to fetch the html codes from the url")
     # TODO: Implement this decorator
 
 
@@ -38,7 +43,9 @@ def fetch_top_1000(url, year):
     Return:
         text: a string. HTML content of the fetch webpage.
     """
-
+    with urllib.request.urlopen(url=url,data="year={}&top=1000&number=""".format(year).encode('ascii')) as f:
+        return f.read().decode()
+    
     # TODO: Implement this function.
     # Send POST request to the given url (https://www.ssa.gov/cgi-bin/popularnames.cgi) with the data by inspecting the web page.
     # Hint: You can concatenate multiple data using '&' (e.g. data = "month=December&day=25")

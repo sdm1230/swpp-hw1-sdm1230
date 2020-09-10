@@ -46,6 +46,15 @@ def check_filename_existence(func):
         BabynameFileNotFoundException: if there is no such file named as the first argument of the function to decorate.
     """
     # TODO: Implement this decorator
+    def wraping(self,dirname,year):
+        
+        filename="{}/{}.html".format(dirname,year)
+        try:
+            return func(self,dirname,year)
+        except:
+            raise BabynameFileNotFoundException("No such file: {}".format(filename))
+    
+    return wraping
 
 
 class BabynameParser:
@@ -62,9 +71,13 @@ class BabynameParser:
             dirname: The name of the directory where baby name html files are stored
             year: The year number. int.
         """
+        self.filename = "{}.html".format(year)
+        self.year = year
 
         text = "TODO" # TODO: Open and read html file of the corresponding year, and assign the content to `text`. 
-
+        pathname = os.path.join(dirname, "{}.html".format(year))
+        with open(pathname, "r") as f:
+            text = f.read()
         # TODO: Implement the tuple extracting code.
         # `self.rank_to_names_tuples` should be a list of tuples of ("rank", "male name", "female name").
         # You can process the file line-by-line, but regex on the whole text at once is even easier.
@@ -72,7 +85,14 @@ class BabynameParser:
         # You may find the following method useful: `re.findall`.
         # See https://docs.python.org/3/library/re.html#re.findall.
         self.rank_to_names_tuples = [("1", "TODO_male", "TODO_female"), ("2", "TODO_male", "TODO_female")]
-    
+        
+        pattern = re.compile("<td>(.+?)</td>")
+        wordlist = re.findall(pattern, text)
+        self.rank_to_names_tuples=[]
+        for i in range(0,1000):
+            tp = tuple([wordlist[3*i],wordlist[3*i+1],wordlist[3*i+2]])
+            self.rank_to_names_tuples.append(tp)
+
     def parse(self, parsing_lambda):
         """
         (2 points)
@@ -86,3 +106,6 @@ class BabynameParser:
             A list of `BabyRecord` objects. (`BabyRecord` class is defined in `run.py`.)
         """
         # TODO: Implement this method
+        return list(map(parsing_lambda,self.rank_to_names_tuples))
+
+        
